@@ -1,0 +1,15 @@
+# Base de Datos SQLite
+*.db
+*.db-wal
+*.db-shm
+
+# Variables de Entorno
+.env
+.env.*
+
+# Binarios de Go
+main
+*.exe
+
+# Cargas de archivos
+/uploads/

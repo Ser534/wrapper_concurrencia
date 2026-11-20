@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Concurrencia Go - Intel i7-4770K Benchmark</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="logo-icon">⚡</div>
+                <div>
+                    <h1>Go Concurrency Engine</h1>
+                    <p class="subtitle">Benchmark & Telemetría en vivo • Intel® Core™ i7-4770K (8 Threads)</p>
+                </div>
+            </div>
+            <div class="status-pill badge-success" id="connection-status">
+                <span class="status-dot"></span> Conectado (3000)
+            </div>
+        </header>
+
+        <!-- Dynamic Grid -->
+        <main class="dashboard-grid">
+            <!-- Card 1: Hardware Telemetry -->
+            <section class="card shadow-glass">
+                <div class="card-header">
+                    <h2>🖥️ Telemetría de Hardware</h2>
+                    <span class="tag">GOMAXPROCS = <strong id="gomaxprocs-val">8</strong></span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Hilos CPU</span>
+                        <span class="stat-value text-accent" id="stat-cpus">8</span>
+                        <span class="stat-sub">Cores lógicos</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Goroutines</span>
+                        <span class="stat-value text-cyan" id="stat-goroutines">--</span>
+                        <span class="stat-sub">Hilos de Go activos</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">RAM Asignada</span>
+                        <span class="stat-value text-purple" id="stat-ram">-- MB</span>
+                        <span class="stat-sub">Uso en Heap</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Ciclos GC</span>
+                        <span class="stat-value text-emerald" id="stat-gc">--</span>
+                        <span class="stat-sub">Garbage Collector</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card 2: Concurrency Engine & Outbox -->
+            <section class="card shadow-glass">
+                <div class="card-header">
+                    <h2>🚀 Motor de Concurrencia (Auto-Scaler)</h2>
+                    <span class="tag tag-blue" id="scaler-status-tag">Estable (8/32 W)</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Workers Totales / Activos</span>
+                        <span class="stat-value text-amber"><span id="stat-current-workers">8</span> / <span id="stat-active-workers">0</span></span>
+                        <span class="stat-sub">Escalado dinámico max <span id="stat-max-workers">32</span></span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Nivel de Cola</span>
+                        <span class="stat-value" id="stat-queue-level">0 / 5000</span>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="queue-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Procesados Total</span>
+                        <span class="stat-value text-emerald" id="stat-total-processed">0</span>
+                        <span class="stat-sub">Tareas completadas</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Outbox DB</span>
+                        <span class="stat-value text-cyan" id="stat-db-completed">0</span>
+                        <span class="stat-sub">Filas en SQLite</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card 3: Interactive Benchmark Test Form -->
+            <section class="card shadow-glass card-wide">
+                <div class="card-header">
+                    <h2>⚡ Banco de Pruebas de Carga en Vivo</h2>
+                    <p class="card-desc">Estresa los 8 hilos de tu procesador simulando goroutines concurrentes insertando y procesando tareas.</p>
+                </div>
+                <div class="benchmark-controls">
+                    <div class="control-group">
+                        <label for="input-concurrency">Goroutines Concurrentes: <strong id="lbl-concurrency">100</strong></label>
+                        <input type="range" id="input-concurrency" min="10" max="1000" step="10" value="100" class="slider">
+                    </div>
+                    <div class="control-group">
+                        <label for="input-jobs">Total de Tareas a Procesar: <strong id="lbl-jobs">2000</strong></label>
+                        <input type="range" id="input-jobs" min="100" max="10000" step="100" value="2000" class="slider">
+                    </div>
+                    <button id="btn-run-benchmark" class="btn btn-primary">
+                        <span class="btn-text">🔥 Lanzar Prueba de Carga</span>
+                        <span class="btn-spinner hidden"></span>
+                    </button>
+                </div>
+
+                <!-- Benchmark Results -->
+                <div id="benchmark-result-panel" class="results-panel hidden">
+                    <h3>📈 Resultado del Benchmark</h3>
+                    <div class="metrics-row">
+                        <div class="metric-card">
+                            <span class="metric-title">Throughput / Rendimiento</span>
+                            <span class="metric-number text-emerald" id="res-throughput">--</span>
+                            <span class="metric-unit">trabajos / segundo</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-title">Tiempo Total Envió</span>
+                            <span class="metric-number text-cyan" id="res-time">--</span>
+                            <span class="metric-unit">segundos</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-title">Aceptados (Backpressure)</span>
+                            <span class="metric-number text-amber" id="res-accepted">--</span>
+                            <span class="metric-unit">rechazados: <span id="res-rejected">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Card 4: Profiling & Diagnostic Links -->
+            <section class="card shadow-glass card-wide">
+                <div class="card-header">
+                    <h2>🔬 Diagnóstico y Profiling Nativo (`pprof`)</h2>
+                    <button id="btn-leak-goroutine" class="btn btn-secondary">
+                        🧪 Simular Fuga de Goroutines (+20)
+                    </button>
+                </div>
+                <div class="links-grid">
+                    <a href="/debug/pprof/" target="_blank" class="profile-link">
+                        <span class="link-icon">📊</span>
+                        <div>
+                            <strong>Visión General pprof</strong>
+                            <p>Índice de memoria, goroutines y allocations</p>
+                        </div>
+                    </a>
+                    <a href="/debug/pprof/goroutine?debug=2" target="_blank" class="profile-link">
+                        <span class="link-icon">🧶</span>
+                        <div>
+                            <strong>Inspección de Goroutines</strong>
+                            <p>Stack trace completo de hilos de Go</p>
+                        </div>
+                    </a>
+                    <a href="/debug/pprof/heap?debug=1" target="_blank" class="profile-link">
+                        <span class="link-icon">💾</span>
+                        <div>
+                            <strong>Perfil de Memoria Heap</strong>
+                            <p>Análisis de asignaciones y memoria retenida</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
